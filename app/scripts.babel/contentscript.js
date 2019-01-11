@@ -3,11 +3,15 @@
 (function(){
   let kKey = 75,
       lKey = 76,
+      pKey = 80,
+      singleQuoteKey = 222,
       leftCommandKey = 91,
       shiftKey = 16,
       keyDown = {
         [kKey]: false,
         [lKey]: false,
+        [pKey]: false,
+        [singleQuoteKey]: false,
         [leftCommandKey]: false,
         [shiftKey]: false
       };
@@ -35,9 +39,17 @@
         resetKeyDown();
         openSearchTab(false);
       }
-      if (keyDown[kKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+      else if (keyDown[kKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
         resetKeyDown();
         openSearchTab(true);
+      }
+      else if (keyDown[pKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+        resetKeyDown();
+        sendMessage({pinTab: true});
+      }
+      else if (keyDown[singleQuoteKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+        resetKeyDown();
+        sendMessage({extractTab: true});
       }
     }
   }
@@ -51,6 +63,10 @@
   function openSearchTab(active=false) {
     let selection = getSelection();
     if (!selection) return;
-    chrome.runtime.sendMessage({searchUrl: `https://www.google.com/search?q=${selection}`, active}, (response) => {})
+    sendMessage({searchUrl: `https://www.google.com/search?q=${selection}`, active})
+  }
+
+  function sendMessage(message) {
+    chrome.runtime.sendMessage(message, (response) => {})
   }
 })();
