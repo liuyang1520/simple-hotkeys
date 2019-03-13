@@ -14,6 +14,7 @@ gulp.task('extras', () => {
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html',
+    '!app/styles.scss'
   ], {
     base: 'app',
     dot: true
@@ -49,8 +50,18 @@ gulp.task('images', () => {
     })))
     .pipe(gulp.dest('dist/images'));
 });
+gulp.task('styles', () => {
+  return gulp.src('app/styles.scss/*.scss')
+    .pipe($.plumber())
+    .pipe($.sass.sync({
+      outputStyle: 'expanded',
+      precision: 10,
+      includePaths: ['.']
+    }).on('error', $.sass.logError))
+    .pipe(gulp.dest('app/styles'));
+});
 
-gulp.task('html',  () => {
+gulp.task('html', ['styles'], () => {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
@@ -94,7 +105,7 @@ gulp.task('babel', () => {
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('watch', ['lint', 'babel'], () => {
+gulp.task('watch', ['lint', 'babel', 'styles'], () => {
   $.livereload.listen();
 
   gulp.watch([
@@ -106,6 +117,7 @@ gulp.task('watch', ['lint', 'babel'], () => {
   ]).on('change', $.livereload.reload);
 
   gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
+  gulp.watch('app/styles.scss/**/*.scss', ['styles']);
   gulp.watch('bower.json', ['wiredep']);
 });
 
@@ -124,7 +136,7 @@ gulp.task('wiredep', () => {
 gulp.task('package', function () {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.zip('selection search hotkey-' + manifest.version + '.zip'))
+      .pipe($.zip('ampassador-' + manifest.version + '.zip'))
       .pipe(gulp.dest('package'));
 });
 
