@@ -28,7 +28,7 @@
 
   function keyUpHandler(e) {
     if (e.keyCode in keyDown) {
-      keyDown[e.keyCode] = false;
+      resetKeyDown();
     }
   }
 
