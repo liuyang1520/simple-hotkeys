@@ -15,6 +15,12 @@
         [leftCommandKey]: false,
         [shiftKey]: false
       };
+  let keycodeStatus = {
+    [kKey]: true,
+    [lKey]: true,
+    [pKey]: true,
+    [singleQuoteKey]: true
+  };
 
   window.addEventListener('keyup', keyUpHandler);
   window.addEventListener('keydown', keyDownHandler);
@@ -35,21 +41,21 @@
   function keyDownHandler(e) {
     if (e.keyCode in keyDown) {
       keyDown[e.keyCode] = true;
-      if (keyDown[lKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
-        resetKeyDown();
-        openSearchTab(false);
-      }
-      else if (keyDown[kKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+      if (keyDown[kKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[kKey]) {
         resetKeyDown();
         openSearchTab(true);
       }
-      else if (keyDown[pKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+      else if (keyDown[lKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[lKey]) {
         resetKeyDown();
-        sendMessage({pinTab: true});
+        openSearchTab(false);
       }
-      else if (keyDown[singleQuoteKey] && keyDown[leftCommandKey] && keyDown[shiftKey]) {
+      else if (keyDown[pKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[pKey]) {
         resetKeyDown();
-        sendMessage({extractTab: true});
+        trigger({pinTab: true});
+      }
+      else if (keyDown[singleQuoteKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
+        resetKeyDown();
+        trigger({extractTab: true});
       }
     }
   }
@@ -63,10 +69,32 @@
   function openSearchTab(active=false) {
     let selection = getSelection();
     if (!selection) return;
-    sendMessage({searchUrl: `https://www.google.com/search?q=${selection}`, active})
+    trigger({searchUrl: `https://www.google.com/search?q=${selection}`, active})
   }
 
-  function sendMessage(message) {
-    chrome.runtime.sendMessage(message, (response) => {})
+  function trigger(message) {
+    chrome.runtime.sendMessage(Object.assign({action: 'trigger'}, message), (response) => {})
   }
+
+  function updateConfig(codes) {
+    if (!Array.isArray(codes)) return;
+    for (let keycode of Object.keys(keycodeStatus)) {
+      keycodeStatus[keycode] = true;
+    }
+    for (let keycode of codes) {
+      keycodeStatus[keycode] = false;
+    }
+  }
+
+  chrome.storage.sync.get('disabledKeycode', (result) => {
+    let codes = result['disabledKeycode']
+    updateConfig(codes);
+  })
+
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if (namespace != 'sync') return;
+    let change = changes['disabledKeycode'];
+    updateConfig(change.newValue);
+    return true;
+  })
 })();
