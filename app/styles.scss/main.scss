@@ -9,7 +9,13 @@ $_slide-distance: $switch-width - ($switch-height - $slide-size) - $slide-size;
 body {
   min-width: 400px;
 
-  .global-switch, .each-item-switch .item {
+  .title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .each-item-switch .item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -86,5 +92,15 @@ body {
         border-radius: 50%;
       }
     }
+  }
+}
+
+.notransition * {
+  -webkit-transition: none !important;
+  transition: none !important;
+
+  ::before {
+    -webkit-transition: none !important;
+    transition: none !important;
   }
 }
