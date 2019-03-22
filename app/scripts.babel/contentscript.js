@@ -41,21 +41,22 @@
   }
 
   function keyDownHandler(e) {
+    let os = getOsName();
     if (e.keyCode in keyDown) {
       keyDown[e.keyCode] = true;
-      if (keyDown[kKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[kKey]) {
+      if (keyDown[kKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[kKey]) {
         resetKeyDown();
         openSearchTab(true);
       }
-      else if (keyDown[lKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[lKey]) {
+      else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
         resetKeyDown();
         openSearchTab(false);
       }
-      else if (keyDown[pKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[pKey]) {
+      else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
         resetKeyDown();
         trigger({pinTab: true});
       }
-      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
+      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
         resetKeyDown();
         trigger({extractTab: true});
       }
@@ -86,6 +87,15 @@
     for (let keycode of codes) {
       keycodeStatus[keycode] = false;
     }
+  }
+
+  function getOsName() {
+    let name = 'mac';
+    if (navigator.appVersion.indexOf('Win') != -1) name = 'win';
+    if (navigator.appVersion.indexOf('Mac') != -1) name = 'mac';
+    if (navigator.appVersion.indexOf('X11') != -1) name = 'unix';
+    if (navigator.appVersion.indexOf('Linux') != -1) name = 'linux';
+    return name
   }
 
   chrome.storage.sync.get('disabledKeycode', (result) => {
