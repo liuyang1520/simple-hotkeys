@@ -6,6 +6,7 @@
       pKey = 80,
       singleQuoteKey = 222,
       leftCommandKey = 91,
+      leftCtrlKey = 17,
       shiftKey = 16,
       keyDown = {
         [kKey]: false,
@@ -13,6 +14,7 @@
         [pKey]: false,
         [singleQuoteKey]: false,
         [leftCommandKey]: false,
+        [leftCtrlKey]: false,
         [shiftKey]: false
       };
   let keycodeStatus = {
@@ -41,19 +43,19 @@
   function keyDownHandler(e) {
     if (e.keyCode in keyDown) {
       keyDown[e.keyCode] = true;
-      if (keyDown[kKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[kKey]) {
+      if (keyDown[kKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[kKey]) {
         resetKeyDown();
         openSearchTab(true);
       }
-      else if (keyDown[lKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[lKey]) {
+      else if (keyDown[lKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[lKey]) {
         resetKeyDown();
         openSearchTab(false);
       }
-      else if (keyDown[pKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[pKey]) {
+      else if (keyDown[pKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[pKey]) {
         resetKeyDown();
         trigger({pinTab: true});
       }
-      else if (keyDown[singleQuoteKey] && keyDown[leftCommandKey] && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
+      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] || keyDown[leftCtrlKey]) && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
         resetKeyDown();
         trigger({extractTab: true});
       }
