@@ -6,15 +6,15 @@
       pKey = 80,
       singleQuoteKey = 222,
       leftCommandKey = 91,
-      leftCtrlKey = 17,
       shiftKey = 16,
+      altKey = 18,
       keyDown = {
         [kKey]: false,
         [lKey]: false,
         [pKey]: false,
         [singleQuoteKey]: false,
         [leftCommandKey]: false,
-        [leftCtrlKey]: false,
+        [altKey]: false,
         [shiftKey]: false
       };
   let keycodeStatus = {
@@ -44,19 +44,19 @@
     let os = getOsName();
     if (e.keyCode in keyDown) {
       keyDown[e.keyCode] = true;
-      if (keyDown[kKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[kKey]) {
+      if (keyDown[kKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[kKey]) {
         resetKeyDown();
         openSearchTab(true);
       }
-      else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
+      else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
         resetKeyDown();
         openSearchTab(false);
       }
-      else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
+      else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
         resetKeyDown();
         trigger({pinTab: true});
       }
-      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[leftCtrlKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
+      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
         resetKeyDown();
         trigger({extractTab: true});
       }
