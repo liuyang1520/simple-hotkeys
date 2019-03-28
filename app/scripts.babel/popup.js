@@ -2,16 +2,16 @@
 
 const SHORTCUT_DESC_MAPPING = {
   'win': new Map([
-    ['17', 'Ctrl + Shift(⇧) + k'],
-    ['76', 'Ctrl + Shift(⇧) + l'],
-    ['80', 'Ctrl + Shift(⇧) + p'],
-    ['222', 'Ctrl + Shift(⇧) + \'']
+    ['17', 'Alt + Shift(⇧) + k'],
+    ['76', 'Alt + Shift(⇧) + l'],
+    ['80', 'Alt + Shift(⇧) + p'],
+    ['222', 'Alt + Shift(⇧) + \'']
   ]),
   'linux': new Map([
-    ['17', 'Ctrl + Shift(⇧) + k'],
-    ['76', 'Ctrl + Shift(⇧) + l'],
-    ['80', 'Ctrl + Shift(⇧) + p'],
-    ['222', 'Ctrl + Shift(⇧) + \'']
+    ['17', 'Alt + Shift(⇧) + k'],
+    ['76', 'Alt + Shift(⇧) + l'],
+    ['80', 'Alt + Shift(⇧) + p'],
+    ['222', 'Alt + Shift(⇧) + \'']
   ]),
   'mac': new Map([
     ['75', 'Command(⌘) + Shift(⇧) + k'],
