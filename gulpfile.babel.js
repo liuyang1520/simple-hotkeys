@@ -136,7 +136,7 @@ gulp.task('wiredep', () => {
 gulp.task('package', function () {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.zip('ampassador-' + manifest.version + '.zip'))
+      .pipe($.zip('simple-hotkeys-' + manifest.version + '.zip'))
       .pipe(gulp.dest('package'));
 });
 
