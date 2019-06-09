@@ -95,7 +95,7 @@ gulp.task('chromeManifest', () => {
   .pipe($.if('*.js', $.sourcemaps.init()))
   .pipe($.if('*.js', $.uglify()))
   .pipe($.if('*.js', $.sourcemaps.write('.')))
-  .pipe(gulp.dest('dist'));
+  .pipe(gulp.dest('../dist'));
 });
 
 gulp.task('babel', () => {
