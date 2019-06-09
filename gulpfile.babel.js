@@ -2,7 +2,6 @@
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
-import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
 const $ = gulpLoadPlugins();
@@ -30,6 +29,9 @@ function lint(files, options) {
 }
 
 gulp.task('lint', lint('app/scripts.babel/**/*.js', {
+  parserOptions: {
+    ecmaVersion: 6
+  },
   env: {
     es6: true
   }
@@ -50,6 +52,7 @@ gulp.task('images', () => {
     })))
     .pipe(gulp.dest('dist/images'));
 });
+
 gulp.task('styles', () => {
   return gulp.src('app/styles.scss/*.scss')
     .pipe($.plumber())
@@ -61,7 +64,7 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('app/styles'));
 });
 
-gulp.task('html', ['styles'], () => {
+gulp.task('html', gulp.series('styles', () => {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
@@ -75,7 +78,7 @@ gulp.task('html', ['styles'], () => {
       removeComments: true
     })))
     .pipe(gulp.dest('dist'));
-});
+}));
 
 gulp.task('chromeManifest', () => {
   return gulp.src('app/manifest.json')
@@ -98,14 +101,14 @@ gulp.task('chromeManifest', () => {
 gulp.task('babel', () => {
   return gulp.src('app/scripts.babel/**/*.js')
       .pipe($.babel({
-        presets: ['es2015']
+        presets: ['@babel/preset-env']
       }))
       .pipe(gulp.dest('app/scripts'));
 });
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('watch', ['lint', 'babel', 'styles'], () => {
+gulp.task('watch', gulp.series(gulp.parallel('lint', 'babel', 'styles'), () => {
   $.livereload.listen();
 
   gulp.watch([
@@ -119,7 +122,7 @@ gulp.task('watch', ['lint', 'babel', 'styles'], () => {
   gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
   gulp.watch('app/styles.scss/**/*.scss', ['styles']);
   gulp.watch('bower.json', ['wiredep']);
-});
+}));
 
 gulp.task('size', () => {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
@@ -140,13 +143,10 @@ gulp.task('package', function () {
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('build', (cb) => {
-  runSequence(
+gulp.task('build', gulp.series(
     'lint', 'babel', 'chromeManifest',
-    ['html', 'images', 'extras'],
-    'size', cb);
-});
+    gulp.parallel('html', 'images', 'extras'),
+    'size'
+));
 
-gulp.task('default', ['clean'], cb => {
-  runSequence('build', cb);
-});
+gulp.task('default', gulp.series('clean', 'build'));
