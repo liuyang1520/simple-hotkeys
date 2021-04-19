@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(details => {
   console.log('previousVersion', details.previousVersion);
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, _sendResponse) => {
   switch (request.action) {
     case 'trigger':
       if (request.searchUrl != null) {
@@ -16,15 +16,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     case 'set':
       chrome.storage.sync.get('disabledKeycode', (result) => {
-        if (request.keycode == null) return;
-        let codes = result['disabledKeycode']
-        if (!Array.isArray(codes)) codes = [];
+        if (request.keycode == null)
+          return;
+        let codes = result['disabledKeycode'];
+        if (!Array.isArray(codes))
+          codes = [];
         if (!request.state && !codes.includes(request.keycode)) {
-          codes.push(request.keycode)
+          codes.push(request.keycode);
         } else if (request.state && codes.includes(request.keycode)) {
-          codes = codes.filter((item) => item != request.keycode)
+          codes = codes.filter((item) => item != request.keycode);
         }
-        chrome.storage.sync.set({'disabledKeycode': codes}, (response) => {
+        chrome.storage.sync.set({'disabledKeycode': codes}, (_response) => {
           console.log(`Saved to storage: ${codes}`);
         });
       })
