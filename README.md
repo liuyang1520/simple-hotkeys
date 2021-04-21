@@ -1,5 +1,5 @@
 # Simple Hotkeys
-A lightweight Chrome extension for enhancing existing Chrome hotkeys.
+A lightweight Chrome extension for enhancing existing Chrome hotkeys ([Chrome Web Store link](https://chrome.google.com/webstore/detail/simple-hotkeys/ciindhhkpajpgcpemjgpbbieiokifdeh/)).
 
 While there are a plenty of extensions giving users a variety of configurations for shortcuts/hotkeys, the ideas behind this application are
 - lightweight
