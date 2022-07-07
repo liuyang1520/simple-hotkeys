@@ -3,7 +3,10 @@ import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
 import {stream as wiredep} from 'wiredep';
+import dartSass from 'sass';
+import gulpSass from 'gulp-sass';
 
+const sass = gulpSass(dartSass);
 const $ = gulpLoadPlugins();
 
 gulp.task('extras', () => {
@@ -59,11 +62,11 @@ gulp.task('images', () => {
 gulp.task('styles', () => {
   return gulp.src('app/styles.scss/*.scss')
     .pipe($.plumber())
-    .pipe($.sass.sync({
+    .pipe(sass.sync({
       outputStyle: 'expanded',
       precision: 10,
       includePaths: ['.']
-    }).on('error', $.sass.logError))
+    }).on('error', sass.logError))
     .pipe(gulp.dest('app/styles'));
 });
 
@@ -84,21 +87,19 @@ gulp.task('html', gulp.series('styles', () => {
 }));
 
 gulp.task('chromeManifest', () => {
-  return gulp.src('app/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: false,
-      background: {
-        target: 'scripts/background.js',
-        exclude: [
-          'scripts/chromereload.js'
-        ]
-      }
-  }))
-  .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
-  .pipe($.if('*.js', $.sourcemaps.init()))
-  .pipe($.if('*.js', $.uglify()))
-  .pipe($.if('*.js', $.sourcemaps.write('.')))
-  .pipe(gulp.dest('./dist'));
+  return gulp.src([
+    'app/manifest.json',
+    'app/scripts/*',
+    '!app/scripts/chromereload.js',
+    'app/styles/*'
+  ], {
+    base: 'app',
+    dot: true
+  }).pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
+    .pipe($.if('*.js', $.sourcemaps.init()))
+    .pipe($.if('*.js', $.uglify()))
+    .pipe($.if('*.js', $.sourcemaps.write('.')))
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('babel', () => {
