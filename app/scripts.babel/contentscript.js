@@ -4,6 +4,7 @@
   let kKey = 75,
       lKey = 76,
       pKey = 80,
+      uKey = 85,
       singleQuoteKey = 222,
       leftCommandKey = 91,
       shiftKey = 16,
@@ -12,6 +13,7 @@
         [kKey]: false,
         [lKey]: false,
         [pKey]: false,
+        [uKey]: false,
         [singleQuoteKey]: false,
         [leftCommandKey]: false,
         [altKey]: false,
@@ -21,6 +23,7 @@
     [kKey]: true,
     [lKey]: true,
     [pKey]: true,
+    [uKey]: true,
     [singleQuoteKey]: true
   };
 
@@ -47,18 +50,18 @@
       if (keyDown[kKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[kKey]) {
         resetKeyDown();
         openSearchTab(true);
-      }
-      else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
+      } else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
         resetKeyDown();
         openSearchTab(false);
-      }
-      else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
+      } else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
         resetKeyDown();
         trigger({pinTab: true});
-      }
-      else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
+      } else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
         resetKeyDown();
         trigger({extractTab: true});
+      } else if (keyDown[uKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[uKey]) {
+        resetKeyDown();
+        trigger({navigateLastTab: true});
       }
     }
   }
@@ -66,17 +69,17 @@
   function resetKeyDown() {
     Object.keys(keyDown).forEach(key => {
       keyDown[key] = false;
-    })
+    });
   }
 
   function openSearchTab(active=false) {
     let selection = getSelection();
     if (!selection) return;
-    trigger({searchUrl: `https://www.google.com/search?q=${selection}`, active})
+    trigger({searchUrl: `https://www.google.com/search?q=${selection}`, active});
   }
 
   function trigger(message) {
-    chrome.runtime.sendMessage(Object.assign({action: 'trigger'}, message), (response) => {})
+    chrome.runtime.sendMessage(Object.assign({action: 'trigger'}, message));
   }
 
   function updateConfig(codes) {

@@ -1,7 +1,32 @@
 'use strict';
 
+const tabs = {};
+
 chrome.runtime.onInstalled.addListener(details => {
   console.log('previousVersion', details.previousVersion);
+});
+
+function removeTab(tabId, windowId) {
+  tabs[windowId] = tabs[windowId].filter(id => id !== tabId);
+  if (tabs[windowId].length === 0) {
+    delete tabs[windowId];
+  }
+}
+
+chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+  if (!tabs[windowId] || !tabs[windowId].length) {
+    tabs[windowId] = [];
+  }
+  tabs[windowId].unshift(tabId);
+  tabs[windowId] = tabs[windowId].filter((id, idx, arr) => arr.indexOf(id) === idx);
+});
+
+chrome.tabs.onRemoved.addListener((tabId, { windowId }) => {
+  removeTab(tabId, windowId);
+});
+
+chrome.tabs.onDetached.addListener((tabId, { oldWindowId }) => {
+  removeTab(tabId, oldWindowId);
 });
 
 chrome.runtime.onMessage.addListener((request, sender, _sendResponse) => {
@@ -13,6 +38,14 @@ chrome.runtime.onMessage.addListener((request, sender, _sendResponse) => {
         chrome.tabs.update(sender.tab.id, {pinned: !sender.tab.pinned});
       } else if (request.extractTab != null) {
         chrome.windows.create({tabId: sender.tab.id})
+      } else if (request.navigateLastTab != null) {
+        chrome.windows.getCurrent({}, ({ id: windowId }) => {
+          if (tabs[windowId].length > 1) {
+            const lastTab = tabs[windowId][1];
+            tabs[windowId] = tabs[windowId].filter(id => id !== lastTab);
+            chrome.tabs.update(lastTab, { active: true });
+          }
+        });
       }
     case 'set':
       chrome.storage.sync.get('disabledKeycode', (result) => {

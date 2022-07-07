@@ -6,24 +6,28 @@ const SHORTCUT_DESC_MAPPING = {
     ['17', 'Alt + Shift(⇧) + k'],
     ['76', 'Alt + Shift(⇧) + l'],
     ['80', 'Alt + Shift(⇧) + p'],
+    ['85', 'Alt + Shift(⇧) + u'],
     ['222', 'Alt + Shift(⇧) + \'']
   ]),
   'linux': new Map([
     ['17', 'Alt + Shift(⇧) + k'],
     ['76', 'Alt + Shift(⇧) + l'],
     ['80', 'Alt + Shift(⇧) + p'],
+    ['85', 'Alt + Shift(⇧) + u'],
     ['222', 'Alt + Shift(⇧) + \'']
   ]),
   'cros': new Map([
     ['17', 'Alt + Shift(⇧) + k'],
     ['76', 'Alt + Shift(⇧) + l'],
     ['80', 'Alt + Shift(⇧) + p'],
+    ['85', 'Alt + Shift(⇧) + u'],
     ['222', 'Alt + Shift(⇧) + \'']
   ]),
   'mac': new Map([
     ['75', 'Command(⌘) + Shift(⇧) + k'],
     ['76', 'Command(⌘) + Shift(⇧) + l'],
     ['80', 'Command(⌘) + Shift(⇧) + p'],
+    ['85', 'Command(⌘) + Shift(⇧) + u'],
     ['222', 'Command(⌘) + Shift(⇧) + \'']
   ])
 };
