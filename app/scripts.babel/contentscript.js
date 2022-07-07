@@ -39,7 +39,7 @@
 
   function keyUpHandler(e) {
     if (e.keyCode in keyDown) {
-      resetKeyDown();
+      resetKeyDown(e.keyCode);
     }
   }
 
@@ -48,28 +48,26 @@
     if (e.keyCode in keyDown) {
       keyDown[e.keyCode] = true;
       if (keyDown[kKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[kKey]) {
-        resetKeyDown();
+        resetKeyDown(e.keyCode);
         openSearchTab(true);
       } else if (keyDown[lKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[lKey]) {
-        resetKeyDown();
+        resetKeyDown(e.keyCode);
         openSearchTab(false);
       } else if (keyDown[pKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[pKey]) {
-        resetKeyDown();
+        resetKeyDown(e.keyCode);
         trigger({pinTab: true});
       } else if (keyDown[singleQuoteKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[singleQuoteKey]) {
-        resetKeyDown();
+        resetKeyDown(e.keyCode);
         trigger({extractTab: true});
       } else if (keyDown[uKey] && (keyDown[leftCommandKey] && os == 'mac' || keyDown[altKey] && os != 'mac') && keyDown[shiftKey] && keycodeStatus[uKey]) {
-        resetKeyDown();
+        resetKeyDown(e.keyCode);
         trigger({navigateLastTab: true});
       }
     }
   }
 
-  function resetKeyDown() {
-    Object.keys(keyDown).forEach(key => {
-      keyDown[key] = false;
-    });
+  function resetKeyDown(keyCode) {
+    keyDown[keyCode] = false;
   }
 
   function openSearchTab(active=false) {
