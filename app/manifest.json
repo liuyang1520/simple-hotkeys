@@ -30,6 +30,41 @@
       "all_frames": false
     }
   ],
+  "commands": {
+    "search-in-new-active-tab": {
+      "description": "Search and jump",
+      "suggested_key": {
+        "default": "Ctrl+Shift+K"
+      }
+    },
+    "search-in-new-background-tab": {
+      "description": "Search in background",
+      "suggested_key": {
+        "default": "Ctrl+Shift+L"
+      }
+    },
+    "pin-unpin-tab": {
+      "description": "Pin / unpin",
+      "suggested_key": {
+        "default": "Ctrl+Shift+P"
+      }
+    },
+    "extract-tab-to-new-window": {
+      "description": "Extract to window"
+    },
+    "navigate-to-last-active-tab": {
+      "description": "Navigate to last active tab",
+      "suggested_key": {
+        "default": "Ctrl+Shift+U"
+      }
+    },
+    "navigate-back-to-last-active-tab-in-stack": {
+      "description": "Navigate back to last active tab in stack"
+    },
+    "navigate-forward-to-last-active-tab-in-stack": {
+      "description": "Navigate forward to last active tab in stack"
+    }
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Simple-Hotkeys",
