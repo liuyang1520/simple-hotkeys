@@ -9,10 +9,11 @@ While there are a plenty of extensions giving users a variety of configurations 
 
 
 ## Features
-- [x] Search text in new tab and switch to it: `Command(⌘) + Shift(⇧) + k`
-- [x] Search text in new tab in background: `Command(⌘) + Shift(⇧) + l`
-- [x] Pin/Unpin current tab:  `Command(⌘) + Shift(⇧) + p`
-- [x] Detach current tab to a new window: `Command(⌘) + Shift(⇧) + \`
+- [x] Search text in new tab and switch to it: `Ctrl/Command(⌘) + Shift(⇧) + k`
+- [x] Search text in new tab in background: `Ctrl/Command(⌘) + Shift(⇧) + l`
+- [x] Pin/Unpin current tab:  `Ctrl/Command(⌘) + Shift(⇧) + p`
+- [x] Detach current tab to a new window: no default
+- [x] Navigate to last active tab: `Ctrl/Command(⌘) + Shift(⇧) + s`
 
 `Command(⌘)` is replaced with `alt` key for Windows computers.
 
@@ -23,9 +24,9 @@ Please feel free to contribute directly or create issues for any bugs and featur
 
 ## Contribution
 1. `npm ci` or `npm install`
-2. `gulp`
+2. `npx gulp`
 3. Load `./dist` into Chrome browser extensions for testing
-4. `gulp package` to create `.zip` package
+4. `npx gulp package` to create `.zip` package
 
 
 ## Credits
