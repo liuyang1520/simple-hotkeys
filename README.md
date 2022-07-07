@@ -15,7 +15,7 @@ While there are a plenty of extensions giving users a variety of configurations 
 - [x] Detach current tab to a new window: no default
 - [x] Navigate to last active tab: `Ctrl/Command(⌘) + Shift(⇧) + s`
 
-`Command(⌘)` is replaced with `alt` key for Windows computers.
+`Command(⌘)` is replaced with `Ctrl` key for Windows computers.
 
 
 ## Issues
