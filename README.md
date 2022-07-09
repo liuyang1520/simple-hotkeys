@@ -13,7 +13,7 @@ While there are a plenty of extensions giving users a variety of configurations 
 - [x] Search text in new tab in background: `Ctrl/Command(⌘) + Shift(⇧) + l`
 - [x] Pin/Unpin current tab:  `Ctrl/Command(⌘) + Shift(⇧) + p`
 - [x] Detach current tab to a new window: no default
-- [x] Navigate to last active tab: `Ctrl/Command(⌘) + Shift(⇧) + s`
+- [x] Navigate to last active tab: `Ctrl/Command(⌘) + Shift(⇧) + e`
 
 `Command(⌘)` is replaced with `Ctrl` key for Windows computers.
 

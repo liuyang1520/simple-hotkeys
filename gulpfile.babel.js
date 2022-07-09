@@ -33,7 +33,7 @@ function lint(files, options) {
 
 gulp.task('lint', lint('app/scripts.babel/**/*.js', {
   parserOptions: {
-    ecmaVersion: 6
+    ecmaVersion: 2017
   },
   env: {
     es6: true
