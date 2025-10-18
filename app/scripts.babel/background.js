@@ -29,87 +29,94 @@ function setValue(key = "tabs", value = []) {
   });
 }
 
-(async () => {
-  const tabs = await getValue();
+// Initialize state loading promise
+let tabs = {};
+let stateReady = getValue().then(value => {
+  tabs = value;
+});
 
-  chrome.runtime.onSuspend.addListener(async () => {
-    await setValue("tabs", tabs);
-  });
+chrome.runtime.onSuspend.addListener(async () => {
+  await setValue("tabs", tabs);
+});
 
-  async function removeTab(tabId, windowId) {
-    if (!tabs[windowId]) {
-      return;
-    }
-    tabs[windowId] = tabs[windowId].filter(id => id !== tabId);
-    if (tabs[windowId].length === 0) {
-      delete tabs[windowId];
-    }
+async function removeTab(tabId, windowId) {
+  if (!tabs[windowId]) {
+    return;
   }
+  tabs[windowId] = tabs[windowId].filter(id => id !== tabId);
+  if (tabs[windowId].length === 0) {
+    delete tabs[windowId];
+  }
+}
 
-  chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {
-    if (!tabs[windowId] || !tabs[windowId].length) {
-      tabs[windowId] = [];
-    }
-    tabs[windowId].unshift(tabId);
-    tabs[windowId] = tabs[windowId].filter((id, idx, arr) => arr.indexOf(id) === idx);
-    await setValue("tabs", tabs);
+chrome.tabs.onActivated.addListener(async ({ tabId, windowId }) => {
+  await stateReady; // Wait for state to be loaded
+  if (!tabs[windowId] || !tabs[windowId].length) {
+    tabs[windowId] = [];
+  }
+  tabs[windowId].unshift(tabId);
+  tabs[windowId] = tabs[windowId].filter((id, idx, arr) => arr.indexOf(id) === idx);
+  await setValue("tabs", tabs);
+});
+
+chrome.tabs.onRemoved.addListener(async (tabId, { windowId }) => {
+  await stateReady; // Wait for state to be loaded
+  await removeTab(tabId, windowId);
+});
+
+chrome.tabs.onDetached.addListener(async (tabId, { oldWindowId }) => {
+  await stateReady; // Wait for state to be loaded
+  await removeTab(tabId, oldWindowId);
+});
+
+function searchSelectedInNewTab(active) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const activeTab = tabs[0];
+    const activeTabId = activeTab.id;
+    chrome.scripting.executeScript(
+      {
+        target: {tabId: activeTabId},
+        func: () => {
+          if (!window || !window.getSelection || !window.getSelection() || !window.getSelection().toString) return;
+          return window.getSelection().toString();
+        }
+      },
+      function(results) {
+        if (!results || !results.length || results.length === 0 || !results[0].result) return;
+        const searchUrl = `https://www.google.com/search?q=${results[0].result}`;
+        chrome.tabs.create({url: searchUrl, active});
+      }
+    );
   });
+}
 
-  chrome.tabs.onRemoved.addListener(async (tabId, { windowId }) => {
-    await removeTab(tabId, windowId);
-  });
+chrome.commands.onCommand.addListener(async (command) => {
+  await stateReady; // Wait for state to be loaded before handling command
 
-  chrome.tabs.onDetached.addListener(async (tabId, { oldWindowId }) => {
-    await removeTab(tabId, oldWindowId);
-  });
-
-  function searchSelectedInNewTab(active) {
+  if (command === "search-in-new-active-tab") {
+    searchSelectedInNewTab(true);
+  } else if (command === "search-in-new-background-tab") {
+    searchSelectedInNewTab(false);
+  } else if (command === "pin-unpin-tab") {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       const activeTab = tabs[0];
       const activeTabId = activeTab.id;
-      chrome.scripting.executeScript(
-        {
-          target: {tabId: activeTabId},
-          func: () => {
-            if (!window || !window.getSelection || !window.getSelection() || !window.getSelection().toString) return;
-            return window.getSelection().toString();
-          }
-        },
-        function(results) {
-          if (!results || !results.length || results.length === 0 || !results[0].result) return;
-          const searchUrl = `https://www.google.com/search?q=${results[0].result}`;
-          chrome.tabs.create({url: searchUrl, active});
-        }
-      );
+      const activeTabPinned = activeTab.pinned;
+      chrome.tabs.update(activeTabId, {pinned: !activeTabPinned});
+    });
+  } else if (command === "extract-tab-to-new-window") {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      const activeTab = tabs[0];
+      const activeTabId = activeTab.id;
+      chrome.windows.create({tabId: activeTabId})
+    });
+  } else if (command === "navigate-to-last-active-tab") {
+    chrome.windows.getCurrent({}, async ({ id: windowId }) => {
+      if (tabs && tabs[windowId] && tabs[windowId].length && tabs[windowId].length > 1) {
+        const lastTab = tabs[windowId][1];
+        tabs[windowId] = tabs[windowId].filter(id => id !== lastTab);
+        chrome.tabs.update(lastTab, { active: true });
+      }
     });
   }
-
-  chrome.commands.onCommand.addListener((command) => {
-    if (command === "search-in-new-active-tab") {
-      searchSelectedInNewTab(true);
-    } else if (command === "search-in-new-background-tab") {
-      searchSelectedInNewTab(false);
-    } else if (command === "pin-unpin-tab") {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        const activeTab = tabs[0];
-        const activeTabId = activeTab.id;
-        const activeTabPinned = activeTab.pinned;
-        chrome.tabs.update(activeTabId, {pinned: !activeTabPinned});
-      });
-    } else if (command === "extract-tab-to-new-window") {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        const activeTab = tabs[0];
-        const activeTabId = activeTab.id;
-        chrome.windows.create({tabId: activeTabId})
-      });
-    } else if (command === "navigate-to-last-active-tab") {
-      chrome.windows.getCurrent({}, async ({ id: windowId }) => {
-        if (tabs && tabs[windowId] && tabs[windowId].length && tabs[windowId].length > 1) {
-          const lastTab = tabs[windowId][1];
-          tabs[windowId] = tabs[windowId].filter(id => id !== lastTab);
-          chrome.tabs.update(lastTab, { active: true });
-        }
-      });
-    }
-  });
-})();
+});
