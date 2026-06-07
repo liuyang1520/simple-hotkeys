@@ -1,0 +1,5 @@
+packages:
+  - .
+
+# Only resolve package versions that have been available for at least seven days.
+minimumReleaseAge: 10080
