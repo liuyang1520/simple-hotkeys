@@ -41,7 +41,11 @@ export default defineConfig({
       16: 'icon-16.png',
       128: 'icon-128.png',
     },
-    permissions: ['storage', 'scripting', 'tabs'],
+    permissions: [
+      'storage',
+      'scripting',
+      ...(browser === 'safari' ? ['tabs'] : []),
+    ],
     host_permissions: ['http://*/*', 'https://*/*'],
     web_accessible_resources:
       browser === 'safari'
