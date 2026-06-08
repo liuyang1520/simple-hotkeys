@@ -1,7 +1,8 @@
 import {
+  findLastAccessedPreviousTab,
   isTabHistory,
   pruneAndFindPreviousTab,
-  recordCreatedActiveTab,
+  recordCreatedTab,
   recordTabActivation,
   removeTabFromHistory,
   type TabHistory,
@@ -157,6 +158,13 @@ function main() {
       return;
     }
 
+    const lastAccessedPreviousTabId =
+      import.meta.env.BROWSER === 'safari'
+        ? await browser.tabs
+            .query({ windowId: activeTab.windowId })
+            .then((tabs) => findLastAccessedPreviousTab(tabs, activeTab.id!))
+            .catch(() => undefined)
+        : undefined;
     let previousTabId: number | undefined;
 
     await updateHistory(async (history) => {
@@ -172,6 +180,7 @@ function main() {
             return false;
           }
         },
+        lastAccessedPreviousTabId,
       );
     });
 
@@ -276,8 +285,23 @@ function main() {
   });
 
   browser.tabs.onCreated.addListener((tab) => {
-    void updateHistory((history) => {
-      recordCreatedActiveTab(history, tab);
+    const activeTabAtCreation =
+      import.meta.env.BROWSER === 'safari' && !tab.active
+        ? browser.tabs
+            .query({ active: true, windowId: tab.windowId })
+            .then((tabs) => tabs.find((activeTab) => activeTab.id !== tab.id)?.id)
+            .catch(() => undefined)
+        : undefined;
+
+    void updateHistory(async (history) => {
+      // Safari can report a foreground-created tab as inactive, so preserve
+      // its opener until the following activation places the new tab first.
+      recordCreatedTab(
+        history,
+        tab,
+        import.meta.env.BROWSER === 'safari',
+        await activeTabAtCreation,
+      );
     });
   });
 

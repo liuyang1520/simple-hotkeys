@@ -7,6 +7,11 @@ type CreatedTab = {
   windowId: number;
 };
 
+type AccessedTab = {
+  id?: number;
+  lastAccessed?: number;
+};
+
 function uniqueTabIds(tabIds: number[]): number[] {
   return tabIds.filter((tabId, index) => tabIds.indexOf(tabId) === index);
 }
@@ -30,19 +35,32 @@ export function recordTabActivation(
   history[windowKey] = uniqueTabIds([tabId, ...(history[windowKey] ?? [])]);
 }
 
-export function recordCreatedActiveTab(
+export function recordCreatedTab(
   history: TabHistory,
   tab: CreatedTab,
+  trackOpener = false,
+  activeTabAtCreation?: number,
 ): void {
-  if (!tab.active || tab.id == null) {
+  if (tab.id == null || (!tab.active && !trackOpener)) {
     return;
   }
 
   const windowKey = String(tab.windowId);
+  const createdTabAlreadyActivated = history[windowKey]?.[0] === tab.id;
   const priorHistory = (history[windowKey] ?? []).filter(
     (tabId) => tabId !== tab.id,
   );
-  const previousTabId = priorHistory[0] ?? tab.openerTabId;
+  const openerTabId = activeTabAtCreation ?? tab.openerTabId;
+  const previousTabId = trackOpener
+    ? (openerTabId ?? priorHistory[0])
+    : (priorHistory[0] ?? openerTabId);
+
+  if (!tab.active && !createdTabAlreadyActivated) {
+    if (openerTabId != null) {
+      history[windowKey] = uniqueTabIds([openerTabId, ...priorHistory]);
+    }
+    return;
+  }
 
   history[windowKey] = uniqueTabIds([
     tab.id,
@@ -68,16 +86,34 @@ export function removeTabFromHistory(
   }
 }
 
+export function findLastAccessedPreviousTab(
+  tabs: AccessedTab[],
+  activeTabId: number,
+): number | undefined {
+  return tabs
+    .filter(
+      (tab): tab is AccessedTab & { id: number; lastAccessed: number } =>
+        tab.id != null &&
+        tab.id !== activeTabId &&
+        tab.lastAccessed != null,
+    )
+    .sort((left, right) => right.lastAccessed - left.lastAccessed)[0]?.id;
+}
+
 export async function pruneAndFindPreviousTab(
   history: TabHistory,
   windowId: number,
   activeTabId: number,
   isLiveTabInWindow: (tabId: number, windowId: number) => Promise<boolean>,
+  preferredPreviousTabId?: number,
 ): Promise<number | undefined> {
   const windowKey = String(windowId);
   const liveHistory = [activeTabId];
 
-  for (const tabId of history[windowKey] ?? []) {
+  for (const tabId of [
+    ...(preferredPreviousTabId == null ? [] : [preferredPreviousTabId]),
+    ...(history[windowKey] ?? []),
+  ]) {
     if (
       tabId !== activeTabId &&
       (await isLiveTabInWindow(tabId, windowId))
